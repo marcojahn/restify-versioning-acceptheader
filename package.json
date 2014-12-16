@@ -9,6 +9,7 @@
   "author": "Marco Jahn",
   "license": "MIT",
   "dependencies": {
-    "restify": "^2.8.4"
+    "restify": "^2.8.4",
+    "xml": "^1.0.0"
   }
 }

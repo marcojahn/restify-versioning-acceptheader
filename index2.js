@@ -1,7 +1,7 @@
 var restify = require('restify');
+var xml = require('xml');
 
-// lib/formatters/json.js
-var formatter = function formatJSON(req, res, body) {
+var formatter = function formatXML(req, res, body) {
     if (body instanceof Error) {
         // snoop for RestError or HttpError, but don't rely on
         // instanceof
@@ -18,7 +18,7 @@ var formatter = function formatJSON(req, res, body) {
         body = body.toString('base64');
     }
 
-    var data = JSON.stringify(body);
+    var data = xml(body);
     res.setHeader('Content-Length', Buffer.byteLength(data));
 
     return (data);
@@ -26,12 +26,7 @@ var formatter = function formatJSON(req, res, body) {
 
 var server = restify.createServer({
     formatters: {
-        // application\/vnd\.[a-z\.]+\.v(\d)[\+a-z]*
-        'application/vnd.app.v1+json': formatter
-        /*function(req, res, body) {
-          console.log('custom formatter called')
-          return JSON.stringify(body);
-        }*/
+        'application/xml': formatter
     }
 });
 
@@ -39,6 +34,10 @@ server.listen(3000, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
 
-server.get('/', function (req, res, next) {
-    res.send({foo: 'bar'})
+server.get({path: '/', version: '1.0.0'}, function (req, res, next) {
+    res.send({foo: 'bar v1'});
+});
+
+server.get({path: '/', version: '2.0.0'}, function (req, res, next) {
+    res.send({foo: 'bar v2'});
 });
